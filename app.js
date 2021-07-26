@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const errorHandler = require('./middleware/error');
 // Route files
-const users = require('./chatBE/router/users');
+const users = require('./router/users');
 
 const connectDb = require('./db');
 connectDb();
