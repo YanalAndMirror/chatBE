@@ -11,9 +11,6 @@ const UserSchema = new mongoose.Schema(
     },
     userName: {
       type: String,
-      //   required: [true, 'Please add a userName'],
-      //   unique: true,
-      trim: true,
       default: '',
       maxlength: [50, 'userName can not be more than 50 characters'],
     },
@@ -21,7 +18,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: 'no-photo.jpg',
     },
-
     createdAt: {
       type: Date,
       default: Date.now,

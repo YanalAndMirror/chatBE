@@ -7,11 +7,14 @@ const ChatSchema = new mongoose.Schema(
       required: [true, 'Please add a type'],
       enum: ['Private', 'Group'],
     },
-    users: {
-      type: Array,
-      required: [true, 'Please add users'],
-      unique: true,
-    },
+    users: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'Please add users'],
+        unique: true,
+      },
+    ],
     createdAt: {
       type: Date,
       default: Date.now,
