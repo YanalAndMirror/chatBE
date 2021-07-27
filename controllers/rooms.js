@@ -58,7 +58,7 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
   res.status(201).json(room);
 });
 
-// @desc add user to group
+// @desc remove user from group
 // @route POST /api/v1/rooms/:roomId/remove
 // @access Private
 exports.removeUserFromGroup = asyncHandler(async (req, res, next) => {
