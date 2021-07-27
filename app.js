@@ -15,7 +15,10 @@ io = socketio(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("New WS Connection");
+  socket.on("chatMessage", ({ roomId, content }) => {
+    console.log({ roomId, content });
+    io.emit("message", { roomId, content });
+  });
 });
 // Route files
 const users = require("./router/users");
