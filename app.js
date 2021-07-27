@@ -15,11 +15,24 @@ io = socketio(server, {
     origin: "*",
   },
 });
+const Session = require("./models/Session");
+const Room = require("./models/Room");
 
 io.on("connection", (socket) => {
-  socket.on("chatMessage", ({ roomId, content }) => {
-    console.log({ roomId, content });
-    io.emit("message", { roomId, content });
+  console.log(socket.id);
+
+  Session.create({ user: "TEST", socket: socket.id });
+  socket.on("disconnect", async () => {
+    console.log(socket.id + " Bye");
+    await Session.deleteOne({ socket: socket.id });
+  });
+  socket.on("chatMessage", async ({ roomId, content }) => {
+    let thisRoom = await Room.findOne({ _id: roomId });
+    console.log(thisRoom.users);
+    let usersSessions = await Session.find({ user: thisRoom.users });
+    usersSessions = usersSessions.map((usersSession) => usersSession.socket);
+    if (usersSessions.length > 0)
+      io.to(usersSessions).emit("message", { roomId, content });
   });
 });
 // Route files
@@ -32,6 +45,7 @@ app.use("/upload", express.static(path.join(__dirname, "upload")));
 
 //app.use(morgan("dev"));
 app.use("/api/v1/users", users);
+
 app.use(errorHandler);
 
 server.listen("8000", console.log(`server running in 8000`));
