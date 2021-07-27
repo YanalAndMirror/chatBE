@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const path = require("path");
+
 //const morgan = require("morgan");
 const cors = require("cors");
 const errorHandler = require("./middleware/error");
@@ -26,6 +28,7 @@ const users = require("./router/users");
 const connectDb = require("./db");
 connectDb();
 app.use(express.json());
+app.use("/upload", express.static(path.join(__dirname, "upload")));
 
 //app.use(morgan("dev"));
 app.use("/api/v1/users", users);
