@@ -43,6 +43,10 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 // @route PUT /api/v1/users/:id
 // @access Private
 exports.updateUser = asyncHandler(async (req, res, next) => {
+  if (req.file) {
+    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
+  }
+
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
