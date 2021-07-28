@@ -17,25 +17,20 @@ io = socketio(server, {
 });
 const Session = require("./models/Session");
 const Room = require("./models/Room");
-
+Session.deleteMany({ user: { $exists: true, $ne: null } }).then((a) => {});
 io.on("connection", (socket) => {
-  console.log(socket.id);
   socket.on("userId", (userId) => {
     Session.create({ user: userId, socket: socket.id });
   });
 
   socket.on("disconnect", async () => {
-    console.log(socket.id + " Bye");
     await Session.deleteOne({ socket: socket.id });
   });
   socket.on("chatMessage", async ({ userId, roomId, content }) => {
-    console.log(userId);
     let thisRoom = await Room.findOne({ _id: roomId });
     let usersSessions = await Session.find({ user: thisRoom.users });
-    console.log(thisRoom.users);
     usersSessions = usersSessions.map((usersSession) => usersSession.socket);
     if (usersSessions.length > 0) {
-      console.log(usersSessions);
       io.to(usersSessions).emit("message", { userId, roomId, content });
     }
   });

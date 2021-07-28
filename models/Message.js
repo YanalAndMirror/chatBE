@@ -1,16 +1,12 @@
 const mongoose = require("mongoose");
 
-const ChatSchema = new mongoose.Schema(
+const MessageSchema = new mongoose.Schema(
   {
-    type: {
-      type: String,
-      required: [true, "Please add a type"],
-      enum: ["Text", "Photo", "File", "Voice"],
-    },
     content: {
-      type: String,
+      type: Array,
       required: [true, "Please add a content"],
     },
+
     room: {
       type: mongoose.Schema.ObjectId,
       ref: "Room",
@@ -25,10 +21,13 @@ const ChatSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    deleted: {
+      type: [String],
+    },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
-module.exports = mongoose.model("Chat", ChatSchema);
+module.exports = mongoose.model("Message", MessageSchema);
