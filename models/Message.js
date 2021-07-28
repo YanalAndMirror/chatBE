@@ -17,6 +17,13 @@ const MessageSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    receivers: [
+      {
+        _id: String,
+        received: { type: Date, default: null },
+        seen: { type: Date, default: null },
+      },
+    ],
     createdAt: {
       type: Date,
       default: Date.now,

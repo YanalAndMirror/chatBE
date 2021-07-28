@@ -37,14 +37,22 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
     req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
   }
-
   const to = await User.findOne({ phoneNumber: req.body.to });
   req.body = {
     ...req.body,
     users: [to._id, req.params.userId],
   };
-  let room = await Room.create(req.body);
-  room = await room.populate("users").execPopulate();
+  const checkRoom = await Room.findOne({
+    type: "Private",
+    users: { $all: req.body.users },
+  });
+  if (checkRoom) {
+    checkRoom.users = req.body.users;
+    room = checkRoom;
+  } else {
+    room = await Room.create(req.body);
+    room = await room.populate("users").execPopulate();
+  }
   res.status(201).json(room);
 });
 
