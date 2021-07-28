@@ -36,4 +36,10 @@ const ChatSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+ChatSchema.virtual("messages", {
+  ref: "Message",
+  localField: "_id",
+  foreignField: "room",
+  justOne: false,
+});
 module.exports = mongoose.model("Chat", ChatSchema);

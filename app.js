@@ -17,6 +17,9 @@ io = socketio(server, {
 });
 const Session = require("./models/Session");
 const Room = require("./models/Room");
+const Message = require("./models/Message");
+const User = require("./models/User");
+
 Session.deleteMany({ user: { $exists: true, $ne: null } }).then((a) => {});
 io.on("connection", (socket) => {
   socket.on("userId", (userId) => {
@@ -28,10 +31,23 @@ io.on("connection", (socket) => {
   });
   socket.on("chatMessage", async ({ userId, roomId, content }) => {
     let thisRoom = await Room.findOne({ _id: roomId });
-    let usersSessions = await Session.find({ user: thisRoom.users });
-    usersSessions = usersSessions.map((usersSession) => usersSession.socket);
-    if (usersSessions.length > 0) {
-      io.to(usersSessions).emit("message", { userId, roomId, content });
+    let thisUser = await User.findById(userId);
+    if (thisRoom) {
+      let thisMessage = await Message.create({
+        content,
+        room: roomId,
+        user: userId,
+      });
+      thisMessage.user = thisUser;
+      let usersSessions = await Session.find({ user: thisRoom.users });
+      usersSessions = usersSessions.map((usersSession) => usersSession.socket);
+      if (usersSessions.length > 0) {
+        io.to(usersSessions).emit("message", {
+          userId,
+          roomId,
+          content: thisMessage,
+        });
+      }
     }
   });
 });

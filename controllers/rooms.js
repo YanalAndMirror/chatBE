@@ -1,8 +1,8 @@
-const User = require('../models/User');
-const Room = require('../models/Room');
+const User = require("../models/User");
+const Room = require("../models/Room");
 
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("../middleware/async");
 
 // @desc Get user rooms
 // @route GET /api/v1/rooms/user/:userId
@@ -10,7 +10,9 @@ const asyncHandler = require('../middleware/async');
 exports.getUserRooms = asyncHandler(async (req, res, next) => {
   const rooms = await Room.find({
     users: { $in: [`${req.params.userId}`] },
-  }).populate('users');
+  })
+    .populate("users")
+    .populate({ path: "messages", populate: { path: "user" } });
   res.status(201).json(rooms);
 });
 
@@ -33,7 +35,7 @@ exports.getRoom = asyncHandler(async (req, res, next) => {
 // @access Private
 exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
-    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
+    req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
   }
 
   const to = await User.findOne({ phoneNumber: req.body.to });
@@ -42,7 +44,7 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
     users: [to._id, req.params.userId],
   };
   let room = await Room.create(req.body);
-  room = await room.populate('users').execPopulate();
+  room = await room.populate("users").execPopulate();
   res.status(201).json(room);
 });
 
@@ -54,7 +56,7 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
   let room = await Room.findByIdAndUpdate(req.params.roomId, {
     $push: { users: to._id },
   });
-  room = await room.populate('users').execPopulate();
+  room = await room.populate("users").execPopulate();
   res.status(201).json(room);
 });
 
@@ -66,7 +68,7 @@ exports.removeUserFromGroup = asyncHandler(async (req, res, next) => {
   let room = await Room.findByIdAndUpdate(req.params.roomId, {
     $pull: { users: to._id },
   });
-  room = await room.populate('users').execPopulate();
+  room = await room.populate("users").execPopulate();
   res.status(201).json(room);
 });
 
@@ -81,6 +83,6 @@ exports.deleteRoom = asyncHandler(async (req, res, next) => {
     );
   } else {
     room.remove();
-    res.status(201).json({ msg: 'deleted' });
+    res.status(201).json({ msg: "deleted" });
   }
 });

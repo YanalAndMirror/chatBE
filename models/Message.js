@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const MessageSchema = new mongoose.Schema(
   {
     content: {
-      type: Array,
+      type: mongoose.Schema.Types.Mixed,
       required: [true, "Please add a content"],
     },
 
@@ -23,6 +23,7 @@ const MessageSchema = new mongoose.Schema(
     },
     deleted: {
       type: [String],
+      default: [],
     },
   },
   {
