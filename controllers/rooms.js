@@ -56,6 +56,18 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
   res.status(201).json(room);
 });
 
+// @desc update room
+// @route put /api/v1/rooms/roomId
+// @access Private
+exports.updateGroup = asyncHandler(async (req, res, next) => {
+  if (req.file) {
+    req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
+  }
+  let room = await Room.findByIdAndUpdate({ _id: req.params.roomId }, req.body);
+  room = await room.populate("users").execPopulate();
+  res.status(201).json(room);
+});
+
 // @desc add user to group
 // @route POST /api/v1/rooms/:roomId/add
 // @access Private
