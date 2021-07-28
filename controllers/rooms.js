@@ -32,12 +32,40 @@ exports.getRoom = asyncHandler(async (req, res, next) => {
 // @route POST /api/v1/rooms/user/:userId
 // @access Private
 exports.createRoom = asyncHandler(async (req, res, next) => {
+  if (req.file) {
+    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
+  }
+
   const to = await User.findOne({ phoneNumber: req.body.to });
   req.body = {
-    type: req.body.type,
+    ...req.body,
     users: [to._id, req.params.userId],
   };
   let room = await Room.create(req.body);
+  room = await room.populate('users').execPopulate();
+  res.status(201).json(room);
+});
+
+// @desc add user to group
+// @route POST /api/v1/rooms/:roomId/add
+// @access Private
+exports.addUserToGroup = asyncHandler(async (req, res, next) => {
+  const to = await User.findOne({ phoneNumber: req.body.to });
+  let room = await Room.findByIdAndUpdate(req.params.roomId, {
+    $push: { users: to._id },
+  });
+  room = await room.populate('users').execPopulate();
+  res.status(201).json(room);
+});
+
+// @desc remove user from group
+// @route POST /api/v1/rooms/:roomId/remove
+// @access Private
+exports.removeUserFromGroup = asyncHandler(async (req, res, next) => {
+  const to = await User.findOne({ phoneNumber: req.body.to });
+  let room = await Room.findByIdAndUpdate(req.params.roomId, {
+    $pull: { users: to._id },
+  });
   room = await room.populate('users').execPopulate();
   res.status(201).json(room);
 });
