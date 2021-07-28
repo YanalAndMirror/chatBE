@@ -1,8 +1,8 @@
-const User = require("../models/User");
-const Room = require("../models/Room");
+const User = require('../models/User');
+const Room = require('../models/Room');
 
-const ErrorResponse = require("../utils/errorResponse");
-const asyncHandler = require("../middleware/async");
+const ErrorResponse = require('../utils/errorResponse');
+const asyncHandler = require('../middleware/async');
 
 // @desc Get user rooms
 // @route GET /api/v1/rooms/user/:userId
@@ -11,8 +11,21 @@ exports.getUserRooms = asyncHandler(async (req, res, next) => {
   const rooms = await Room.find({
     users: { $in: [`${req.params.userId}`] },
   })
-    .populate("users")
-    .populate({ path: "messages", populate: { path: "user" } });
+    .populate('users')
+    .populate({ path: 'messages', populate: { path: 'user' } });
+  res.status(201).json(rooms);
+});
+
+// @desc Get Channel rooms
+// @route GET /api/v1/rooms/channels/
+// @access Public
+exports.getChannels = asyncHandler(async (req, res, next) => {
+  const rooms = await Room.find({
+    type: 'Channel',
+  })
+    .populate('users')
+    .populate({ path: 'messages', populate: { path: 'user' } });
+
   res.status(201).json(rooms);
 });
 
@@ -35,15 +48,24 @@ exports.getRoom = asyncHandler(async (req, res, next) => {
 // @access Private
 exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
-    req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
+    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
   }
   const to = await User.findOne({ phoneNumber: req.body.to });
-  req.body = {
-    ...req.body,
-    users: [to._id, req.params.userId],
-  };
+  if (req.body.type === 'Channel') {
+    req.body = {
+      ...req.body,
+      users: [req.params.userId],
+    };
+    room = await Room.create(req.body);
+    room = await room.populate('users').execPopulate();
+  } else {
+    req.body = {
+      ...req.body,
+      users: [to._id, req.params.userId],
+    };
+  }
   const checkRoom = await Room.findOne({
-    type: "Private",
+    type: 'Private',
     users: { $all: req.body.users },
   });
   if (checkRoom) {
@@ -51,7 +73,7 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
     room = checkRoom;
   } else {
     room = await Room.create(req.body);
-    room = await room.populate("users").execPopulate();
+    room = await room.populate('users').execPopulate();
   }
   res.status(201).json(room);
 });
@@ -61,10 +83,10 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
 // @access Private
 exports.updateGroup = asyncHandler(async (req, res, next) => {
   if (req.file) {
-    req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
+    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
   }
   let room = await Room.findByIdAndUpdate({ _id: req.params.roomId }, req.body);
-  room = await room.populate("users").execPopulate();
+  room = await room.populate('users').execPopulate();
   res.status(201).json(room);
 });
 
@@ -76,7 +98,7 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
   let room = await Room.findByIdAndUpdate(req.params.roomId, {
     $push: { users: to._id },
   });
-  room = await room.populate("users").execPopulate();
+  room = await room.populate('users').execPopulate();
   res.status(201).json(room);
 });
 
@@ -88,7 +110,7 @@ exports.removeUserFromGroup = asyncHandler(async (req, res, next) => {
   let room = await Room.findByIdAndUpdate(req.params.roomId, {
     $pull: { users: to._id },
   });
-  room = await room.populate("users").execPopulate();
+  room = await room.populate('users').execPopulate();
   res.status(201).json(room);
 });
 
@@ -103,6 +125,6 @@ exports.deleteRoom = asyncHandler(async (req, res, next) => {
     );
   } else {
     room.remove();
-    res.status(201).json({ msg: "deleted" });
+    res.status(201).json({ msg: 'deleted' });
   }
 });

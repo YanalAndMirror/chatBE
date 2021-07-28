@@ -9,6 +9,7 @@ const {
   addUserToGroup,
   removeUserFromGroup,
   updateGroup,
+  getChannels,
 } = require('../controllers/rooms');
 const router = express.Router();
 router.route('/user/:userId').post(upload.single('photo'), createRoom);
@@ -17,6 +18,8 @@ router.route('/:roomId/add').post(addUserToGroup);
 router.route('/:roomId/remove').post(removeUserFromGroup);
 
 router.route('/user/:userId').get(getUserRooms);
+router.route('/channels/').get(getChannels);
+
 router
   .route('/:roomId')
   .get(getRoom)

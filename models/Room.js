@@ -1,30 +1,30 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const ChatSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      required: [true, "Please add a type"],
-      enum: ["Private", "Group"],
+      required: [true, 'Please add a type'],
+      enum: ['Private', 'Group', 'Channel'],
     },
     users: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     name: {
       type: String,
       default: null,
-      maxlength: [50, "userName can not be more than 50 characters"],
+      maxlength: [50, 'userName can not be more than 50 characters'],
     },
     photo: {
       type: String,
-      default: "no-photo.jpg",
+      default: 'no-photo.jpg',
     },
     admin: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
     },
     createdAt: {
       type: Date,
@@ -36,10 +36,10 @@ const ChatSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
-ChatSchema.virtual("messages", {
-  ref: "Message",
-  localField: "_id",
-  foreignField: "room",
+ChatSchema.virtual('messages', {
+  ref: 'Message',
+  localField: '_id',
+  foreignField: 'room',
   justOne: false,
 });
-module.exports = mongoose.model("Chat", ChatSchema);
+module.exports = mongoose.model('Chat', ChatSchema);
