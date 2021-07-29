@@ -1,5 +1,5 @@
-const express = require('express');
-const upload = require('../middleware/multer');
+const express = require("express");
+const upload = require("../middleware/multer");
 
 const {
   getUserRooms,
@@ -10,20 +10,23 @@ const {
   removeUserFromGroup,
   updateGroup,
   getChannels,
-} = require('../controllers/rooms');
+  deleteMessage,
+} = require("../controllers/rooms");
 const router = express.Router();
-router.route('/user/:userId').post(upload.single('photo'), createRoom);
+router.route("/user/:userId").post(upload.single("photo"), createRoom);
 
-router.route('/:roomId/add').post(addUserToGroup);
-router.route('/:roomId/remove').post(removeUserFromGroup);
+router.route("/:roomId/add").post(addUserToGroup);
+router.route("/:roomId/remove").post(removeUserFromGroup);
 
-router.route('/user/:userId').get(getUserRooms);
-router.route('/channels/').get(getChannels);
+router.route("/user/:userId").get(getUserRooms);
+router.route("/user/:userId/delete/:messageId").get(deleteMessage);
+
+router.route("/channels/").get(getChannels);
 
 router
-  .route('/:roomId')
+  .route("/:roomId")
   .get(getRoom)
   .delete(deleteRoom)
-  .put(upload.single('photo'), updateGroup);
+  .put(upload.single("photo"), updateGroup);
 
 module.exports = router;

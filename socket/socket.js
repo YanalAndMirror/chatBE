@@ -1,6 +1,7 @@
 const Session = require("../models/Session");
 const ChatMessages = require("./ChatMessage");
 const Disconnect = require("./Disconnect");
+const MessageUpdate = require("./MessageUpdate");
 const RoomSeen = require("./RoomSeen");
 
 const SocketIo = () => {
@@ -13,6 +14,10 @@ const SocketIo = () => {
     socket.on("disconnect", Disconnect(socket));
     socket.on("chatMessage", ChatMessages);
     socket.on("roomSeen", RoomSeen);
+    // Delete for all / Edit
+    socket.on("messageUpdate", MessageUpdate);
+
+    //
   });
 };
 module.exports = SocketIo;
