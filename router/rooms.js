@@ -11,9 +11,12 @@ const {
   updateGroup,
   getChannels,
   deleteMessage,
+  uploadFile,
 } = require("../controllers/rooms");
 const router = express.Router();
 router.route("/user/:userId").post(upload.single("photo"), createRoom);
+
+router.route("/attachment").post(upload.single("file"), uploadFile);
 
 router.route("/:roomId/add").post(addUserToGroup);
 router.route("/:roomId/remove").post(removeUserFromGroup);

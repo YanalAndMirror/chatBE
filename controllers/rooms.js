@@ -51,6 +51,9 @@ exports.getRoom = asyncHandler(async (req, res, next) => {
 // @desc Create room
 // @route POST /api/v1/rooms/user/:userId
 // @access Private
+exports.uploadFile = async (req, res, next) => {
+  res.status(201).json(`http://${req.get("host")}/upload/${req.file.filename}`);
+};
 exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
     req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;

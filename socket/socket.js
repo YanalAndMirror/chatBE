@@ -2,6 +2,8 @@ const Session = require("../models/Session");
 const ChatMessages = require("./ChatMessage");
 const Disconnect = require("./Disconnect");
 const MessageUpdate = require("./MessageUpdate");
+const Peer = require("./peer");
+const PeerRecive = require("./peerRecive");
 const RoomSeen = require("./RoomSeen");
 const StartSession = require("./startSession");
 
@@ -14,16 +16,8 @@ const SocketIo = () => {
     socket.on("chatMessage", ChatMessages);
     socket.on("roomSeen", RoomSeen);
     socket.on("messageUpdate", MessageUpdate);
-    socket.on("peer", async ({ data, userId }) => {
-      let thisUser = await Session.find({ user: userId });
-      console.log("peer" + thisUser);
-      socket.to(thisUser.map((a) => a.socket)).emit("startPeer", { data });
-    });
-    socket.on("peerRecive", async ({ data, userId }) => {
-      let thisUser = await Session.find({ user: userId });
-      console.log("peerRecive" + thisUser);
-      socket.to(thisUser.map((a) => a.socket)).emit("reciverPeer", { data });
-    });
+    socket.on("peer", Peer(socket));
+    socket.on("peerRecive", PeerRecive(socket));
   });
 };
 module.exports = SocketIo;
