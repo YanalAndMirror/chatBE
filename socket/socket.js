@@ -19,23 +19,24 @@ const SocketIo = () => {
     socket.on("roomSeen", RoomSeen);
     socket.on("messageUpdate", MessageUpdate);
 
-    socket.on("call", async ({ userId, sender }) => {
+    socket.on("call", async ({ userId, sender, video }) => {
       let thisUser = await Session.find({ user: userId });
-      socket.to(thisUser.map((a) => a.socket)).emit("call", { sender });
+      socket.to(thisUser.map((a) => a.socket)).emit("call", { sender, video });
     });
     socket.on("callAccept", async ({ userId }) => {
-      console.log(userId);
       let thisUser = await Session.find({ user: userId });
-      console.log(thisUser);
       socket.to(thisUser.map((a) => a.socket)).emit("callAccept", "calling");
+    });
+    socket.on("callDecline", async ({ userId }) => {
+      let thisUser = await Session.find({ user: userId });
+      socket.to(thisUser.map((a) => a.socket)).emit("callDecline", "calling");
     });
     socket.on("peer", Peer(socket));
     socket.on("peerRecive", PeerRecive(socket));
-
     socket.on("endCall", async ({ roomId }) => {
       let thisRoom = await Room.findOne({ _id: roomId });
       let usersSessions = await Session.find({ user: thisRoom.users });
-      socket.to(usersSessions.map((a) => a.socket)).emit("peerEnd", "calling");
+      io.to(usersSessions.map((a) => a.socket)).emit("peerEnd", "calling");
     });
   });
 };
