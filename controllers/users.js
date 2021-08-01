@@ -1,6 +1,6 @@
-const User = require('../models/User');
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
+const User = require("../models/User");
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("../middleware/async");
 
 // @desc Get all users
 // @route GET /api/v1/users
@@ -15,7 +15,10 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 // @route GET /api/v1/users/login
 // @access Public
 exports.loginUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findOne({ phoneNumber: req.body.phoneNumber });
+  const user = await User.findOne({
+    phoneNumber: req.body.phoneNumber,
+    code: req.body.code,
+  });
   res.status(201).json(user);
 });
 
@@ -35,8 +38,16 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 // @route POST /api/v1/users/
 // @access Private
 exports.createUser = asyncHandler(async (req, res, next) => {
-  const user = await User.create(req.body);
-  res.status(201).json(user);
+  let code = Math.floor(100000 + Math.random() * 900000);
+  let user = await User.findOne({ phoneNumber: req.body.phoneNumber });
+  if (!user) {
+    await User.create({ phoneNumber: req.body.phoneNumber, code });
+  } else {
+    user.code = code;
+    await user.save();
+  }
+  // to do SEND CODE
+  res.status(201).json(code);
 });
 
 // @desc Update user
@@ -44,7 +55,7 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 // @access Private
 exports.updateUser = asyncHandler(async (req, res, next) => {
   if (req.file) {
-    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
+    req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
   }
 
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
