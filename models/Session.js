@@ -8,7 +8,9 @@ const SessionSchema = new mongoose.Schema(
     socket: {
       type: String,
     },
-
+    secretKey: {
+      type: String,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

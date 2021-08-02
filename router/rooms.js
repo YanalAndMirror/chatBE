@@ -21,7 +21,7 @@ router.route("/attachment").post(upload.single("file"), uploadFile);
 router.route("/:roomId/add").post(addUserToGroup);
 router.route("/:roomId/remove").post(removeUserFromGroup);
 
-router.route("/user/:userId").get(getUserRooms);
+router.route("/user/:userId").put(getUserRooms);
 router.route("/user/:userId/delete/:messageId").get(deleteMessage);
 
 router.route("/channels/").get(getChannels);

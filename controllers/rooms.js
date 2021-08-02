@@ -1,7 +1,8 @@
 const User = require("../models/User");
 const Room = require("../models/Room");
 const Message = require("../models/Message");
-
+const CryptoJS = require("crypto-js");
+const nodeCrypto = require("create-ecdh");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 
@@ -18,7 +19,21 @@ exports.getUserRooms = asyncHandler(async (req, res, next) => {
       populate: { path: "user" },
       match: { deleted: { $nin: [req.params.userId] } },
     });
-  res.status(201).json(rooms);
+  if (req.body.publicKey) {
+    let server = nodeCrypto("secp256k1");
+    server.generateKeys();
+    let publicKey = server.getPublicKey(null, "compressed");
+    let secretKey = server
+      .computeSecret(Buffer.from(req.body.publicKey))
+      .toString("hex");
+    let ciphertext = CryptoJS.AES.encrypt(
+      JSON.stringify(rooms),
+      secretKey
+    ).toString();
+    res.status(201).json({ publicKey, ciphertext });
+  } else {
+    res.status(201).json(rooms);
+  }
 });
 
 // @desc Get Channel rooms
