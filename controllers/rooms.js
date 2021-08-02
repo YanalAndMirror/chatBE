@@ -1,9 +1,9 @@
-const User = require("../models/User");
-const Room = require("../models/Room");
-const Message = require("../models/Message");
+const User = require('../models/User');
+const Room = require('../models/Room');
+const Message = require('../models/Message');
 
-const ErrorResponse = require("../utils/errorResponse");
-const asyncHandler = require("../middleware/async");
+const ErrorResponse = require('../utils/errorResponse');
+const asyncHandler = require('../middleware/async');
 
 // @desc Get user rooms
 // @route GET /api/v1/rooms/user/:userId
@@ -12,10 +12,10 @@ exports.getUserRooms = asyncHandler(async (req, res, next) => {
   const rooms = await Room.find({
     users: { $in: [`${req.params.userId}`] },
   })
-    .populate("users")
+    .populate('users')
     .populate({
-      path: "messages",
-      populate: { path: "user" },
+      path: 'messages',
+      populate: { path: 'user' },
       match: { deleted: { $nin: [req.params.userId] } },
     });
   res.status(201).json(rooms);
@@ -26,10 +26,10 @@ exports.getUserRooms = asyncHandler(async (req, res, next) => {
 // @access Public
 exports.getChannels = asyncHandler(async (req, res, next) => {
   const rooms = await Room.find({
-    type: "Channel",
+    type: 'Channel',
   })
-    .populate("users")
-    .populate({ path: "messages", populate: { path: "user" } });
+    .populate('users')
+    .populate({ path: 'messages', populate: { path: 'user' } });
 
   res.status(201).json(rooms);
 });
@@ -52,20 +52,20 @@ exports.getRoom = asyncHandler(async (req, res, next) => {
 // @route POST /api/v1/rooms/user/:userId
 // @access Private
 exports.uploadFile = async (req, res, next) => {
-  res.status(201).json(`http://${req.get("host")}/upload/${req.file.filename}`);
+  res.status(201).json(`http://${req.get('host')}/upload/${req.file.filename}`);
 };
 exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
-    req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
+    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
   }
   const to = await User.findOne({ phoneNumber: req.body.to });
-  if (req.body.type === "Channel") {
+  if (req.body.type === 'Channel') {
     req.body = {
       ...req.body,
       users: [req.params.userId],
     };
     room = await Room.create(req.body);
-    room = await room.populate("users").execPopulate();
+    room = await room.populate('users').execPopulate();
   } else {
     req.body = {
       ...req.body,
@@ -73,7 +73,7 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
     };
   }
   const checkRoom = await Room.findOne({
-    type: "Private",
+    type: 'Private',
     users: { $all: req.body.users },
   });
   if (checkRoom) {
@@ -81,7 +81,7 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
     room = checkRoom;
   } else {
     room = await Room.create(req.body);
-    room = await room.populate("users").execPopulate();
+    room = await room.populate('users').execPopulate();
   }
   res.status(201).json(room);
 });
@@ -91,10 +91,10 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
 // @access Private
 exports.updateGroup = asyncHandler(async (req, res, next) => {
   if (req.file) {
-    req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
+    req.body.photo = `http://${req.get('host')}/upload/${req.file.filename}`;
   }
   let room = await Room.findByIdAndUpdate({ _id: req.params.roomId }, req.body);
-  room = await room.populate("users").execPopulate();
+  room = await room.populate('users').execPopulate();
   res.status(201).json(room);
 });
 
@@ -106,14 +106,14 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
   let room = await Room.findByIdAndUpdate(req.params.roomId, {
     $push: { users: to._id },
   });
-  room = await room.populate("users").execPopulate();
+  room = await room.populate('users').execPopulate();
   res.status(201).json(room);
 });
 exports.deleteMessage = asyncHandler(async (req, res, next) => {
   await Message.findByIdAndUpdate(req.params.messageId, {
     $push: { deleted: req.params.userId },
   });
-  res.status(201).json("success");
+  res.status(201).json('success');
 });
 // @desc remove user from group
 // @route POST /api/v1/rooms/:roomId/remove
@@ -123,7 +123,7 @@ exports.removeUserFromGroup = asyncHandler(async (req, res, next) => {
   let room = await Room.findByIdAndUpdate(req.params.roomId, {
     $pull: { users: to._id },
   });
-  room = await room.populate("users").execPopulate();
+  room = await room.populate('users').execPopulate();
   res.status(201).json(room);
 });
 
@@ -138,6 +138,6 @@ exports.deleteRoom = asyncHandler(async (req, res, next) => {
     );
   } else {
     room.remove();
-    res.status(201).json({ msg: "deleted" });
+    res.status(201).json({ msg: 'deleted' });
   }
 });
