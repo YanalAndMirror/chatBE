@@ -75,10 +75,16 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
   }
 
   if (req.body.type === "Channel" || req.body.type === "Group") {
-    req.body = {
-      ...req.body,
-      users: [...req.body.to.split(","), req.params.userId],
-    };
+    if (req.body.type === "Group")
+      req.body = {
+        ...req.body,
+        users: [...req.body.to.split(","), req.params.userId],
+      };
+    else
+      req.body = {
+        ...req.body,
+        users: [req.params.userId],
+      };
     room = await Room.create(req.body);
     room = await room.populate("users").execPopulate();
   } else {
