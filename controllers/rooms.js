@@ -73,30 +73,33 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
     req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
   }
-  const to = await User.findOne({ phoneNumber: req.body.to });
-  if (req.body.type === "Channel") {
+
+  if (req.body.type === "Channel" || req.body.type === "Group") {
     req.body = {
       ...req.body,
-      users: [req.params.userId],
+      users: [...req.body.to.split(","), req.params.userId],
     };
+    console.log(req.body);
     room = await Room.create(req.body);
     room = await room.populate("users").execPopulate();
   } else {
+    const to = await User.findOne({ phoneNumber: req.body.to });
     req.body = {
       ...req.body,
       users: [to._id, req.params.userId],
     };
-  }
-  const checkRoom = await Room.findOne({
-    type: "Private",
-    users: { $all: req.body.users },
-  });
-  if (checkRoom) {
-    checkRoom.users = req.body.users;
-    room = checkRoom;
-  } else {
-    room = await Room.create(req.body);
-    room = await room.populate("users").execPopulate();
+
+    const checkRoom = await Room.findOne({
+      type: "Private",
+      users: { $all: req.body.users },
+    });
+    if (checkRoom) {
+      checkRoom.users = req.body.users;
+      room = checkRoom;
+    } else {
+      room = await Room.create(req.body);
+      room = await room.populate("users").execPopulate();
+    }
   }
   res.status(201).json(room);
 });
