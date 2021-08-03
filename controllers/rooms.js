@@ -73,7 +73,6 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
     req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
   }
-
   if (req.body.type === "Channel" || req.body.type === "Group") {
     if (req.body.type === "Group")
       req.body = {
