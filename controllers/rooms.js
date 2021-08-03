@@ -79,7 +79,6 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
       ...req.body,
       users: [...req.body.to.split(","), req.params.userId],
     };
-    console.log(req.body);
     room = await Room.create(req.body);
     room = await room.populate("users").execPopulate();
   } else {
