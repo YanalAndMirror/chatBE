@@ -15,7 +15,7 @@ const SocketIo = () => {
   io.on("connection", (socket) => {
     socket.on("startSession", StartSession(socket));
     socket.on("disconnect", Disconnect(socket));
-    socket.on("chatMessage", ChatMessages);
+    socket.on("chatMessage", ChatMessages(socket));
     socket.on("roomSeen", RoomSeen);
     socket.on("messageUpdate", MessageUpdate);
 
