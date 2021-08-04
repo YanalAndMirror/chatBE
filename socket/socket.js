@@ -23,16 +23,20 @@ const SocketIo = () => {
       let thisUser = await Session.find({ user: userId });
       socket.to(thisUser.map((a) => a.socket)).emit("call", { sender, video });
     });
+
     socket.on("callAccept", async ({ userId }) => {
       let thisUser = await Session.find({ user: userId });
       socket.to(thisUser.map((a) => a.socket)).emit("callAccept", "calling");
     });
+
     socket.on("callDecline", async ({ userId }) => {
       let thisUser = await Session.find({ user: userId });
       socket.to(thisUser.map((a) => a.socket)).emit("callDecline", "calling");
     });
+
     socket.on("peer", Peer(socket));
     socket.on("peerRecive", PeerRecive(socket));
+
     socket.on("endCall", async ({ roomId }) => {
       let thisRoom = await Room.findOne({ _id: roomId });
       let usersSessions = await Session.find({ user: thisRoom.users });
@@ -40,4 +44,5 @@ const SocketIo = () => {
     });
   });
 };
+
 module.exports = SocketIo;

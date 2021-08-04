@@ -36,4 +36,5 @@ const UserSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
 module.exports = mongoose.model("User", UserSchema);

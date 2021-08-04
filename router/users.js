@@ -1,5 +1,5 @@
-const express = require('express');
-const upload = require('../middleware/multer');
+const express = require("express");
+const upload = require("../middleware/multer");
 
 const {
   getUsers,
@@ -8,14 +8,16 @@ const {
   loginUser,
   updateUser,
   deleteUser,
-} = require('../controllers/users');
+} = require("../controllers/users");
+
 const router = express.Router();
-router.route('/').get(getUsers).post(createUser);
-router.route('/login').post(loginUser);
+
+router.route("/").get(getUsers).post(createUser);
+router.route("/login").post(loginUser);
 router
-  .route('/:id')
+  .route("/:id")
   .get(getUser)
-  .put(upload.single('photo'), updateUser)
+  .put(upload.single("photo"), updateUser)
   .delete(deleteUser);
 
 module.exports = router;

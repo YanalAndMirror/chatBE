@@ -6,7 +6,6 @@ const MessageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed,
       required: [true, "Please add a content"],
     },
-
     room: {
       type: mongoose.Schema.ObjectId,
       ref: "Room",
@@ -38,4 +37,5 @@ const MessageSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
 module.exports = mongoose.model("Message", MessageSchema);

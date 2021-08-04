@@ -19,6 +19,7 @@ exports.getUserRooms = asyncHandler(async (req, res, next) => {
       populate: { path: "user" },
       match: { deleted: { $nin: [req.params.userId] } },
     });
+
   if (req.body.publicKey) {
     let server = nodeCrypto("secp256k1");
     server.generateKeys();
@@ -69,6 +70,7 @@ exports.getRoom = asyncHandler(async (req, res, next) => {
 exports.uploadFile = async (req, res, next) => {
   res.status(201).json(`http://${req.get("host")}/upload/${req.file.filename}`);
 };
+
 exports.createRoom = asyncHandler(async (req, res, next) => {
   if (req.file) {
     req.body.photo = `http://${req.get("host")}/upload/${req.file.filename}`;
@@ -97,6 +99,7 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
       type: "Private",
       users: { $all: req.body.users },
     });
+
     if (checkRoom) {
       checkRoom.users = req.body.users;
       room = checkRoom;
@@ -131,12 +134,14 @@ exports.addUserToGroup = asyncHandler(async (req, res, next) => {
   room = await room.populate("users").execPopulate();
   res.status(201).json(room);
 });
+
 exports.deleteMessage = asyncHandler(async (req, res, next) => {
   await Message.findByIdAndUpdate(req.params.messageId, {
     $push: { deleted: req.params.userId },
   });
   res.status(201).json("success");
 });
+
 // @desc remove user from group
 // @route POST /api/v1/rooms/:roomId/remove
 // @access Private

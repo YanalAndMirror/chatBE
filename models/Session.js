@@ -21,4 +21,5 @@ const SessionSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
 module.exports = mongoose.model("Session", SessionSchema);

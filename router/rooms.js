@@ -13,7 +13,9 @@ const {
   deleteMessage,
   uploadFile,
 } = require("../controllers/rooms");
+
 const router = express.Router();
+
 router.route("/user/:userId").post(upload.single("photo"), createRoom);
 
 router.route("/attachment").post(upload.single("file"), uploadFile);

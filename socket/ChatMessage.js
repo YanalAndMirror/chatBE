@@ -8,18 +8,22 @@ const ChatMessages =
   (socket) =>
   async ({ userId, roomId, content }) => {
     let thisUserSession = await Session.findOne({ socket: socket.id });
+
     if (!thisUserSession) return;
+
     if (thisUserSession.secretKey) {
-      console.log(content);
+      console.log(content); //Remove console log
       content = JSON.parse(
         CryptoJS.AES.decrypt(content, thisUserSession.secretKey).toString(
           CryptoJS.enc.Utf8
         )
       );
-      console.log(content);
+      console.log(content); //Remove console log
     }
+
     let thisRoom = await Room.findOne({ _id: roomId });
     let thisUser = await User.findById(userId);
+
     if (thisRoom) {
       let usersSessions = await Session.find({ user: thisRoom.users });
       let OnlineUsers = usersSessions.map((usersSession) => usersSession.user);
@@ -39,15 +43,18 @@ const ChatMessages =
             };
           }),
       });
+
       thisMessage.user = thisUser;
       //usersSessions = usersSessions.map((usersSession) => usersSession.socket);
 
       let OfflineUsers = thisRoom.users.filter(
         (user) => !OnlineUsers.includes(user._id.toString())
       );
+
       OfflineUsers.forEach((user) => {
         //send Notifcation
       });
+
       if (usersSessions.length > 0) {
         usersSessions.forEach((userSession) => {
           let cypherText;

@@ -2,8 +2,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 
-// Error handeling
-
+// Error handling
 const errorHandler = require("./middleware/error");
 
 // Route files
@@ -38,6 +37,7 @@ app.use("/api/v1/rooms", rooms);
 app.use(errorHandler);
 
 server.listen("8000", console.log(`server running in 8000`));
+
 // error mw
 process.on("unhandledRejection", (err, promise) => {
   console.log(`Error ${err.message}`);
