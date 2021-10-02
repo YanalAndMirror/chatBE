@@ -37,7 +37,7 @@ app.use("/api/v1/users", users);
 app.use("/api/v1/rooms", rooms);
 app.use(errorHandler);
 
-server.listen("8000", console.log(`server running in 8000`));
+server.listen("8080", console.log(`server running in 8080`));
 // error mw
 process.on("unhandledRejection", (err, promise) => {
   console.log(`Error ${err.message}`);
